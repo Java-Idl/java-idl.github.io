@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Javagar's Projects</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23080808%22/><text x=%2250%22 y=%2275%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2270%22 fill=%22%23D4AF37%22 text-anchor=%22middle%22>J</text><rect x=%225%22 y=%225%22 width=%2290%22 height=%2290%22 rx=%2215%22 fill=%22none%22 stroke=%22%23D4AF37%22 stroke-width=%225%22/></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Fascinate+Inline&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Formal Gold Palette */
+            --gold-main: #D4AF37;       
+            --gold-bright: #FFD700;     
+            --gold-dark: #8a6e2f;       
+            --bg-color: #080808;        
+            --grid-color: rgba(212, 175, 55, 0.1);
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: "Audiowide", sans-serif;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            user-select: none; 
+            -webkit-user-select: none;
+            overscroll-behavior: none;
+        }
+
+        /* Typography */
+        .fascinate-font { font-family: "Fascinate Inline", system-ui; }
+        .audiowide-font { font-family: "Audiowide", sans-serif; }
+
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh; 
+            height: 100dvh; 
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            box-sizing: border-box;
+            z-index: 20;
+        }
+
+        .top-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            pointer-events: auto;
+            position: relative;
+            z-index: 35;
+            /* Removed the drop-shadow filter here as it causes the mobile glitch */
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin: 0;
+            letter-spacing: 4px;
+            
+            /* Gradient Text Settings (Desktop) */
+            background: linear-gradient(180deg, #ffffff 0%, var(--gold-main) 40%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent; 
+            
+            text-transform: uppercase;
+            line-height: 1.1;
+            padding-bottom: 10px; /* Space for descenders */
+        }
+
+        .subtitle {
+            color: var(--gold-main);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            opacity: 0.9;
+            margin-top: 5px;
+            border-top: 1px solid var(--gold-dark);
+            display: inline-block;
+            padding-top: 10px;
+        }
+
+        /* Search Bar Styling */
+        .search-container {
+            pointer-events: auto;
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            z-index: 30;
+        }
+
+        #search-input {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--gold-dark);
+            color: var(--gold-main);
+            padding: 12px 15px;
+            font-family: "Audiowide", sans-serif;
+            font-size: 0.9rem;
+            width: 200px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            font-size: 16px; 
+        }
+
+        #search-input:focus {
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            width: 240px;
+        }
+        
+        #search-input::placeholder {
+            color: rgba(212, 175, 55, 0.4);
+            font-size: 0.8rem;
+        }
+
+        /* Controls */
+        .controls {
+            pointer-events: auto;
+            text-align: center;
+            z-index: 35;
+            padding-bottom: 10px;
+        }
+
+        button#toggle-motion {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--gold-main);
+            color: var(--gold-main);
+            padding: 10px 20px;
+            font-family: "Audiowide", sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            border-radius: 0; 
+        }
+
+        button#toggle-motion:hover {
+            background: var(--gold-main);
+            color: #000;
+        }
+        
+        /* Canvas & Scene */
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none; 
+        }
+
+        #scene-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            perspective: 800px;
+            z-index: 10;
+        }
+
+        .node-link {
+            position: absolute;
+            transform-style: preserve-3d;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: color 0.2s;
+            will-change: transform, opacity, filter;
+            padding: 10px; 
+        }
+
+        .node-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #000;
+            border: 1px solid var(--gold-main);
+            border-radius: 0; 
+            margin-bottom: 8px; 
+            box-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .node-text {
+            color: var(--gold-main);
+            font-size: 13px;
+            text-shadow: 1px 1px 0 #000; 
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+
+        /* Interactive States */
+        .node-link:hover .node-dot, 
+        .node-link:focus .node-dot,
+        .node-link.is-searched .node-dot {
+            background-color: var(--gold-bright);
+            transform: scale(1.5);
+            box-shadow: 0 0 15px var(--gold-main);
+            border-color: #fff;
+        }
+
+        .node-link:hover .node-text, 
+        .node-link:focus .node-text,
+        .node-link.is-searched .node-text {
+            color: #fff;
+            opacity: 1;
+            text-shadow: 0 0 10px var(--gold-main);
+        }
+
+        /* --- MOBILE RESPONSIVENESS FIXES --- */
+        @media (max-width: 850px) {
+            #ui-layer {
+                padding: 20px 10px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+                letter-spacing: 2px;
+                
+                /* MOBILE FIX: Disable gradient, use solid gold */
+                background: none;
+                -webkit-text-fill-color: initial;
+                color: var(--gold-main);
+                
+                /* Add simple text shadow for legibility */
+                text-shadow: 0 2px 0 #000;
+            }
+
+            .subtitle {
+                font-size: 0.7rem;
+                letter-spacing: 3px;
+            }
+
+            .search-container {
+                position: relative;
+                top: auto;
+                left: auto;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                margin-top: 15px; 
+                margin-bottom: 10px;
+            }
+
+            #search-input {
+                width: 80%;
+                max-width: 300px;
+            }
+
+            .controls { margin-bottom: 20px; }
+            .footer { display: none; }
+            .node-text { font-size: 11px; }
+        }
+        
+        @media (max-height: 500px) and (orientation: landscape) {
+            h1 { font-size: 1.5rem; }
+            .search-container { display: none; } 
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .node-link { transition: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="ui-layer">
+        <div class="top-section">
+            <header>
+                <h1 class="fascinate-font">Javagar's Projects</h1>
+                <div class="subtitle audiowide-font">Link Page</div>
+            </header>
+
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search Node..." autocomplete="off">
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="toggle-motion" aria-pressed="false">Pause Motion</button>
+            <div class="footer audiowide-font" style="margin-top: 15px; font-size: 0.65rem; color: #666; letter-spacing: 1px;">
+                [ TAB ] NAVIGATE | [ CLICK ] View
+            </div>
+        </div>
+    </div>
+
+    <div id="scene-container"></div>
+    <canvas id="connections"></canvas>
+
+    <script>
+        const canvas = document.getElementById('connections');
+        const ctx = canvas.getContext('2d');
+        const scene = document.getElementById('scene-container');
+        const motionBtn = document.getElementById('toggle-motion');
+        const searchInput = document.getElementById('search-input');
+
+        // --- Configuration ---
+        const config = {
+            sphereRadius: 280,
+            baseRotationSpeed: 0.002,
+            mouseSensitivity: 0.00008, 
+            perspective: 800,
+            connectionDistance: 120,
+            isPaused: false
+        };
+
+        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (mediaQuery.matches) {
+            config.isPaused = true;
+            motionBtn.textContent = "Resume Motion";
+            motionBtn.setAttribute('aria-pressed', 'true');
+        }
+
+        // --- Data ---
+        const links = [
+            { text: "TOTP Research", url: "https://totp-research.kudos-kebab-kept.workers.dev/" },
+            { text: "Authenticator", url: "https://authenticator.kudos-kebab-kept.workers.dev/" },
+            { text: "Bio Audio Research", url: "https://bio-audio-research.kudos-kebab-kept.workers.dev/" },
+            { text: "Neon Blob Jump", url: "https://neon-blob-jump.kudos-kebab-kept.workers.dev/" },
+            { text: "Digital Garden", url: "https://digital-garden.kudos-kebab-kept.workers.dev/" },
+            { text: "Shift Context", url: "https://shift-context.kudos-kebab-kept.workers.dev/" },
+            { text: "Encrypt Tool", url: "https://java-idl.github.io/Encrypt/" },
+            { text: "Smart Blob", url: "https://java-idl.github.io/Smart-Blob-Engine/" }
+        ];
+
+        let points = [];
+        let width, height, cx, cy;
+        
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let isMouseOver = false;
+        
+        let focusedPoint = null; 
+        let searchedPoint = null; 
+        let isSearchHovering = false; 
+
+        let currentRotX = 0;
+        let currentRotY = 0;
+
+        class Point {
+            constructor(data, id, total) {
+                this.data = data;
+                
+                const phi = Math.acos(1 - 2 * (id + 0.5) / total);
+                const theta = Math.PI * (1 + Math.sqrt(5)) * (id + 0.5);
+                
+                this.x = config.sphereRadius * Math.sin(phi) * Math.cos(theta);
+                this.y = config.sphereRadius * Math.sin(phi) * Math.sin(theta);
+                this.z = config.sphereRadius * Math.cos(phi);
+                
+                this.screenX = 0;
+                this.screenY = 0;
+                this.alpha = 1;
+
+                this.element = document.createElement('a');
+                this.element.href = data.url;
+                this.element.className = 'node-link';
+                this.element.target = "_blank";
+                this.element.setAttribute('aria-label', `Visit ${data.text}`);
+                
+                this.element.innerHTML = `
+                    <div class="node-dot"></div>
+                    <span class="node-text">${data.text}</span>
+                `;
+
+                this.element.addEventListener('focus', () => {
+                    focusedPoint = this;
+                    config.isPaused = true; 
+                });
+
+                this.element.addEventListener('blur', () => {
+                    focusedPoint = null;
+                    if (!mediaQuery.matches && motionBtn.innerText === "PAUSE MOTION") {
+                        config.isPaused = false;
+                    }
+                });
+
+                scene.appendChild(this.element);
+            }
+
+            rotate(angleX, angleY) {
+                let cosY = Math.cos(angleY);
+                let sinY = Math.sin(angleY);
+
+                let x1 = this.x * cosY - this.z * sinY;
+                let z1 = this.z * cosY + this.x * sinY;
+
+                let cosX = Math.cos(angleX);
+                let sinX = Math.sin(angleX);
+
+                let y1 = this.y * cosX - z1 * sinX;
+                let z2 = z1 * cosX + this.y * sinX;
+
+                this.x = x1;
+                this.y = y1;
+                this.z = z2;
+            }
+
+            updateDOM() {
+                const scale = config.perspective / (config.perspective - this.z);
+                this.screenX = this.x * scale; 
+                this.screenY = this.y * scale; 
+                this.alpha = Math.max(0.2, (this.z + config.sphereRadius) / (2 * config.sphereRadius));
+
+                this.element.style.transform = `translate3d(${this.screenX}px, ${this.screenY}px, 0) scale(${scale}) translate(-50%, -50%)`;
+                this.element.style.opacity = this.alpha;
+                this.element.style.zIndex = Math.floor(this.z + config.sphereRadius) + 100;
+                
+                const blurAmount = Math.max(0, (config.sphereRadius - this.z) / 80);
+                this.element.style.filter = `blur(${blurAmount}px)`;
+                this.element.style.visibility = 'visible';
+            }
+        }
+
+        function init() {
+            resize();
+            points = links.map((link, i) => new Point(link, i, links.length));
+            loop();
+        }
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            cx = width / 2;
+            cy = height / 2;
+            
+            // MOBILE ADJUSTMENT: 
+            // If width is smaller than height (portrait mobile), use a larger multiplier (0.42)
+            // This prevents the sphere from looking tiny on phones.
+            const isPortrait = width < height;
+            const multiplier = isPortrait ? 0.42 : 0.35;
+            
+            config.sphereRadius = Math.min(width, height) * multiplier;
+            
+            if (!isMouseOver) {
+                mouseX = cx;
+                mouseY = cy;
+            }
+        }
+
+        function drawConnections() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.save();
+            ctx.translate(cx, cy);
+            
+            ctx.strokeStyle = 'rgba(212, 175, 55, 0.2)'; 
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i < points.length; i++) {
+                const p1 = points[i];
+                if (p1.alpha < 0.3) continue; 
+
+                for (let j = i + 1; j < points.length; j++) {
+                    const p2 = points[j];
+                    if (p2.alpha < 0.3) continue;
+
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const dz = p1.z - p2.z;
+                    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+                    if (dist < config.connectionDistance) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.screenX, p1.screenY);
+                        ctx.lineTo(p2.screenX, p2.screenY);
+                        ctx.stroke();
+                    }
+                }
+            }
+            ctx.restore();
+        }
+
+        // --- Search Logic ---
+        searchInput.addEventListener('mouseenter', () => { isSearchHovering = true; });
+        searchInput.addEventListener('mouseleave', () => { isSearchHovering = false; });
+
+        // Touch logic for search (Mobile)
+        searchInput.addEventListener('touchstart', () => { isSearchHovering = true; }, {passive: true});
+        searchInput.addEventListener('touchend', () => { 
+            // slight delay to allow typing
+            setTimeout(() => isSearchHovering = false, 5000); 
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase().trim();
+            points.forEach(p => p.element.classList.remove('is-searched'));
+            searchedPoint = null;
+
+            if (val.length >= 2) {
+                const match = points.find(p => p.data.text.toLowerCase().includes(val));
+                if (match) {
+                    searchedPoint = match;
+                    match.element.classList.add('is-searched');
+                }
+            }
+        });
+
+        function loop() {
+            let targetRotX = 0;
+            let targetRotY = 0;
+
+            const activeTarget = focusedPoint || searchedPoint;
+
+            if (activeTarget) {
+                const k = 0.05; 
+                targetRotY = Math.atan2(activeTarget.x, activeTarget.z) * k;
+                targetRotX = Math.atan2(activeTarget.y, activeTarget.z) * k;
+            
+            } else if (isSearchHovering) {
+                targetRotY = 0.005; 
+                targetRotX = 0; 
+
+            } else if (!config.isPaused) {
+                if (isMouseOver) {
+                    targetRotY = (mouseX - cx) * config.mouseSensitivity;
+                    targetRotX = (mouseY - cy) * config.mouseSensitivity;
+
+                    let nearestDist = Infinity;
+                    points.forEach(p => {
+                        if (p.z > 0) { 
+                            const dx = mouseX - (cx + p.screenX);
+                            const dy = mouseY - (cy + p.screenY);
+                            const d = Math.sqrt(dx*dx + dy*dy);
+                            if (d < nearestDist) nearestDist = d;
+                        }
+                    });
+
+                    const brakeThreshold = 120;
+                    if (nearestDist < brakeThreshold) {
+                        const brakeFactor = Math.max(0.05, nearestDist / brakeThreshold);
+                        targetRotY *= brakeFactor;
+                        targetRotX *= brakeFactor;
+                    }
+                } else {
+                    targetRotY = config.baseRotationSpeed;
+                }
+            }
+
+            const smoothness = 0.05;
+            currentRotX += (targetRotX - currentRotX) * smoothness;
+            currentRotY += (targetRotY - currentRotY) * smoothness;
+
+            points.forEach(p => {
+                p.rotate(currentRotX, currentRotY);
+                p.updateDOM();
+            });
+
+            drawConnections();
+            requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('resize', resize);
+        
+        window.addEventListener('mousemove', e => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            isMouseOver = true;
+        });
+
+        window.addEventListener('mouseout', () => {
+            isMouseOver = false;
+        });
+
+        // Touch Events for Mobile Rotation
+        window.addEventListener('touchmove', e => {
+            mouseX = e.touches[0].clientX;
+            mouseY = e.touches[0].clientY;
+            isMouseOver = true;
+        }, {passive: true});
+
+        window.addEventListener('touchend', () => {
+             // Keep spinning slowly after touch release
+            isMouseOver = false;
+        });
+
+        motionBtn.addEventListener('click', () => {
+            config.isPaused = !config.isPaused;
+            motionBtn.textContent = config.isPaused ? "Resume Motion" : "Pause Motion";
+            motionBtn.setAttribute('aria-pressed', config.isPaused);
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                const interactiveElements = [
+                    searchInput, 
+                    motionBtn, 
+                    ...document.querySelectorAll('.node-link')
+                ];
+                
+                const first = interactiveElements[0];
+                const last = interactiveElements[interactiveElements.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    }
+                } else {
+                    if (document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>
