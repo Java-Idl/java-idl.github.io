@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Javagar's Projects</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23080808%22/><text x=%2250%22 y=%2275%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2270%22 fill=%22%23D4AF37%22 text-anchor=%22middle%22>J</text><rect x=%225%22 y=%225%22 width=%2290%22 height=%2290%22 rx=%2215%22 fill=%22none%22 stroke=%22%23D4AF37%22 stroke-width=%225%22/></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Fascinate+Inline&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="ui-layer">
+        <div class="top-section">
+            <header>
+                <h1 class="fascinate-font">Javagar's Projects</h1>
+                <div class="subtitle audiowide-font">Link Page</div>
+            </header>
+
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search Node..." autocomplete="off">
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="toggle-motion" aria-pressed="false">Pause Motion</button>
+            <div class="footer audiowide-font" style="margin-top: 15px; font-size: 0.65rem; color: #666; letter-spacing: 1px;">
+                [ TAB ] NAVIGATE | [ CLICK ] View
+            </div>
+        </div>
+    </div>
+
+    <div id="scene-container"></div>
+    <canvas id="connections"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
