@@ -4,6 +4,14 @@ const scene = document.getElementById('scene-container');
 const motionBtn = document.getElementById('toggle-motion');
 const searchInput = document.getElementById('search-input');
 
+// --- Preview Pane Elements ---
+const previewSidebar = document.getElementById('preview-sidebar');
+const previewFrame = document.getElementById('preview-frame');
+const previewTitle = document.getElementById('preview-title');
+const previewLink = document.getElementById('preview-link');
+const closePreviewBtn = document.getElementById('close-preview');
+let previewDebounceTimer = null;
+
 // --- Configuration ---
 const config = {
     sphereRadius: 280,
@@ -57,7 +65,8 @@ class Point {
         this.element = document.createElement('a');
         this.element.href = data.url;
         this.element.className = 'node-link';
-        this.element.target = "_blank";
+        // We remove target="_blank" behavior in JS, but keep it in HTML for fallback
+        this.element.target = "_blank"; 
         this.element.setAttribute('aria-label', `Visit ${data.text}`);
         
         this.element.innerHTML = `
@@ -65,9 +74,21 @@ class Point {
             <span class="node-text">${data.text}</span>
         `;
 
+        // --- Event Listeners ---
+
+        // CLICK: Open immediately
+        this.element.addEventListener('click', (e) => {
+            e.preventDefault(); // Stop normal navigation
+            focusedPoint = this;
+            config.isPaused = true;
+            loadPreviewNow(this.data);
+        });
+
+        // FOCUS: Open with delay (Debounce) to prevent lag while tabbing
         this.element.addEventListener('focus', () => {
             focusedPoint = this;
             config.isPaused = true; 
+            schedulePreview(this.data);
         });
 
         this.element.addEventListener('blur', () => {
@@ -75,6 +96,8 @@ class Point {
             if (!mediaQuery.matches && motionBtn.innerText === "PAUSE MOTION") {
                 config.isPaused = false;
             }
+            // Cancel any pending preview load if user tabs away quickly
+            clearTimeout(previewDebounceTimer);
         });
 
         scene.appendChild(this.element);
@@ -156,6 +179,61 @@ function drawConnections() {
     }
     ctx.restore();
 }
+
+// --- Preview Logic ---
+
+function schedulePreview(data) {
+    // Cancel any existing timer
+    clearTimeout(previewDebounceTimer);
+    // Wait 800ms before loading. If user tabs away, 'blur' will clear this.
+    previewDebounceTimer = setTimeout(() => {
+        loadPreviewNow(data);
+    }, 800);
+}
+
+function loadPreviewNow(data) {
+    clearTimeout(previewDebounceTimer);
+    
+    // Update Sidebar UI
+    previewTitle.textContent = data.text;
+    previewLink.href = data.url;
+    previewSidebar.classList.add('active');
+
+    // Only load if it's a new URL (prevents reloading on repeated clicks)
+    if (previewFrame.getAttribute('src') !== data.url) {
+        previewFrame.classList.remove('loaded'); // Hide until loaded
+        previewFrame.src = data.url;
+        
+        previewFrame.onload = () => {
+            previewFrame.classList.add('loaded');
+        };
+    }
+}
+
+function closePreview() {
+    previewSidebar.classList.remove('active');
+    
+    // Clear iframe source after animation to free memory/CPU
+    setTimeout(() => {
+        previewFrame.src = ''; 
+        previewFrame.classList.remove('loaded');
+    }, 500);
+}
+
+// Close preview when clicking X
+closePreviewBtn.addEventListener('click', closePreview);
+
+// Close preview when clicking outside sidebar and nodes
+window.addEventListener('click', (e) => {
+    const isNode = e.target.closest('.node-link');
+    const isSidebar = e.target.closest('#preview-sidebar');
+    if (!isNode && !isSidebar) {
+        closePreview();
+    }
+});
+
+
+// --- Existing Event Listeners ---
 
 searchInput.addEventListener('mouseenter', () => { isSearchHovering = true; });
 searchInput.addEventListener('mouseleave', () => { isSearchHovering = false; });
@@ -242,5 +320,7 @@ window.addEventListener('keydown', (e) => {
         } else {
             if (document.activeElement === last) { e.preventDefault(); first.focus(); }
         }
+    } else if (e.key === 'Escape') {
+        closePreview();
     }
 });
