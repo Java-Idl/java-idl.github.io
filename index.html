@@ -33,7 +33,19 @@
             </div>
         </div>
     </div>
-
+    <aside id="preview-sidebar">
+        <div class="preview-header">
+            <h2 id="preview-title" class="audiowide-font">Project Name</h2>
+            <div class="preview-controls">
+                <a id="preview-link" href="#" target="_blank" class="preview-btn">OPEN FULL</a>
+                <button id="close-preview" class="preview-btn">×</button>
+            </div>
+        </div>
+        <div class="preview-content">
+            <div class="iframe-loader">Loading...</div>
+            <iframe id="preview-frame" title="Website Preview"></iframe>
+        </div>
+    </aside>
     <div id="scene-container"></div>
     <canvas id="connections"></canvas>
 
@@ -41,4 +53,5 @@
     
     <script src="script.js"></script>
 </body>
+
 </html>
