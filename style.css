@@ -1,10 +1,13 @@
 :root {
-    /* Formal Gold Palette */
-    --gold-main: #D4AF37;        
-    --gold-bright: #FFD700;      
-    --gold-dark: #8a6e2f;        
-    --bg-color: #080808;        
-    --grid-color: rgba(212, 175, 55, 0.1);
+    /* Solid High Contrast Palette */
+    --gold-main: #D4AF37;
+    --gold-light: #F4CF57;
+    --bg-color: #050505;
+    --panel-bg: #000000;
+    --border-color: #333333;
+    /* CHANGED: Reduced from Gold to Gray */
+    --grid-color: rgba(212, 175, 55, 0.08);
+    /* Fainter grid */
 }
 
 body {
@@ -12,320 +15,249 @@ body {
     overflow: hidden;
     background-color: var(--bg-color);
     font-family: "Audiowide", sans-serif;
-    background-image: 
+    background-image:
         linear-gradient(var(--grid-color) 1px, transparent 1px),
         linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-    background-size: 40px 40px;
-    user-select: none; 
-    -webkit-user-select: none;
-    overscroll-behavior: none;
+    background-size: 50px 50px;
+    /* user-select: none; REMOVED to fix iframe cursor issues */
 }
 
-/* Typography */
-.fascinate-font { font-family: "Fascinate Inline", system-ui; }
-.audiowide-font { font-family: "Audiowide", sans-serif; }
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
 
-/* UI Overlay */
+.fascinate-font {
+    font-family: "Fascinate Inline", system-ui;
+}
+
+.audiowide-font {
+    font-family: "Audiowide", sans-serif;
+}
+
+/* --- SIDEBAR PANEL --- */
 #ui-layer {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100vh; 
-    height: 100dvh; 
+    width: 320px;
+    height: 100vh;
+    z-index: 2000;
     pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 40px;
-    box-sizing: border-box;
-    z-index: 20;
+    user-select: none;
+    /* Applied locally */
 }
 
-.top-section {
+.sidebar-panel {
+    pointer-events: auto;
+    width: 100%;
+    height: 100%;
+    background-color: var(--panel-bg);
+    border-right: 2px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
-    pointer-events: none;
+    padding: 30px 20px;
+    box-sizing: border-box;
+    box-shadow: 10px 0 50px rgba(0, 0, 0, 0.8);
 }
 
 header {
-    text-align: center;
-    pointer-events: auto;
-    position: relative;
-    z-index: 35;
+    margin-bottom: 40px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 20px;
 }
 
 h1 {
-    font-size: 4rem;
+    font-size: 3rem;
     margin: 0;
-    letter-spacing: 4px;
-    background: linear-gradient(180deg, #ffffff 0%, var(--gold-main) 40%, var(--gold-dark) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent; 
+    color: var(--gold-main);
     text-transform: uppercase;
-    line-height: 1.1;
-    padding-bottom: 10px;
+    line-height: 1;
+    letter-spacing: 2px;
 }
 
 .subtitle {
-    color: var(--gold-main);
-    font-size: 0.9rem;
-    text-transform: uppercase;
+    color: #FFF;
+    font-size: 0.8rem;
     letter-spacing: 6px;
-    opacity: 0.9;
-    margin-top: 5px;
-    border-top: 1px solid var(--gold-dark);
-    display: inline-block;
-    padding-top: 10px;
+    margin-top: 10px;
 }
 
-/* --- SEARCH BAR STYLING --- */
+/* --- CONTROLS --- */
 .search-container {
-    pointer-events: auto;
-    position: absolute;
-    top: 40px;
-    left: 40px;
-    z-index: 30;
+    width: 100%;
+    margin-bottom: 20px;
 }
 
 #search-input {
-    background: rgba(0,0,0,0.8);
-    border: 1px solid var(--gold-dark);
+    width: 100%;
+    background: #111;
+    border: 1px solid var(--border-color);
     color: var(--gold-main);
-    padding: 12px 15px;
+    padding: 15px;
     font-family: "Audiowide", sans-serif;
-    font-size: 0.9rem;
-    width: 200px;
+    font-size: 1rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    outline: none; 
-    transition: all 0.3s ease;
-    box-shadow: 0 0 5px rgba(0,0,0,0.5);
-    font-size: 16px; 
+    box-sizing: border-box;
+    outline: none;
 }
 
 #search-input:focus {
-    border-color: var(--gold-bright);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-    width: 240px;
+    background: #000;
+    border-color: var(--gold-light);
+    box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.2);
 }
 
-#search-input::placeholder {
-    color: rgba(212, 175, 55, 0.4);
-    font-size: 0.8rem;
-}
-
-/* --- CONTROLS (Bottom Center HUD) --- */
 .controls {
-    pointer-events: auto;
-    position: absolute;
-    bottom: 30px; /* Anchored to bottom */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 35;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-}
-
-.button-group {
-    display: flex;
     gap: 15px;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 8px 15px;
-    border: 1px solid var(--gold-dark);
-    border-radius: 30px; /* Pill shape */
-    backdrop-filter: blur(4px); /* Glass effect */
+    margin-bottom: auto;
+    /* Push footer down */
 }
 
 button {
     background: transparent;
-    border: 1px solid transparent; 
+    border: 1px solid var(--border-color);
     color: var(--gold-main);
     font-family: "Audiowide", sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
+    padding: 15px;
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    transition: all 0.3s ease;
-    padding: 8px 16px;
-    border-radius: 20px;
-    outline: none;
-    white-space: nowrap;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+    text-align: left;
 }
 
 button:hover {
-    background: rgba(212, 175, 55, 0.15);
-    color: #fff;
-    border-color: var(--gold-main);
-    text-shadow: 0 0 8px var(--gold-main);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    background: var(--gold-main);
+    color: #000;
+    font-weight: bold;
 }
 
 button:active {
-    transform: scale(0.95);
+    transform: translateX(2px);
 }
 
-button[aria-pressed="true"] {
-    color: var(--gold-dark);
-    opacity: 0.7;
+/* --- LIST VIEW (Inside Sidebar) --- */
+#list-container {
+    margin-top: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    border-top: 1px solid var(--border-color);
+    padding-top: 10px;
 }
 
-/* --- CANVAS & SCENE --- */
+#list-container.hidden {
+    display: none;
+}
+
+.list-item {
+    padding: 12px 10px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.list-item:hover,
+.list-item.is-selected {
+    background: #222;
+    border-left: 4px solid var(--gold-main);
+    padding-left: 6px;
+}
+
+.list-item-text {
+    color: var(--gold-main);
+    font-size: 0.9rem;
+}
+
+.list-item-arrow {
+    display: none;
+}
+
+/* --- FOOTER --- */
+.footer {
+    border-top: 1px dashed #333;
+    padding-top: 20px;
+    font-size: 0.6rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* --- CANVAS & NODES --- */
 canvas {
-    display: block;
     position: absolute;
+    /* content-fix */
     top: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: none; 
-    transition: opacity 0.5s ease;
+    left: 320px !important;
+    width: calc(100% - 320px) !important;
+    height: 100vh;
+    user-select: none;
+    /* Applied locally */
 }
 
 #scene-container {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    /* content-fix */
+    left: calc(50% + 160px) !important;
+    top: 50% !important;
+    /* Ensure it has no size so hits pass through surroundings? or full size? */
+    /* Best to be a 0x0 anchor point for the children */
     width: 0;
     height: 0;
-    perspective: 800px;
-    z-index: 10;
-    transition: opacity 0.5s ease;
-}
-
-/* Hide 3D elements when list is active */
-.hidden-3d #scene-container,
-.hidden-3d canvas {
-    opacity: 0;
-    pointer-events: none;
+    overflow: visible;
 }
 
 .node-link {
     position: absolute;
     transform-style: preserve-3d;
     text-decoration: none;
-    white-space: nowrap;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: color 0.2s;
-    will-change: transform, opacity;
-    padding: 10px; 
-    outline: none; 
-    -webkit-tap-highlight-color: transparent;
+    padding: 10px;
+    outline: none;
 }
 
 .node-dot {
-    width: 8px;
-    height: 8px;
-    background-color: #000;
-    border: 1px solid var(--gold-main);
-    border-radius: 0; 
-    margin-bottom: 8px; 
-    box-shadow: 0 0 5px rgba(212, 175, 55, 0.2);
-    transition: transform 0.2s, background-color 0.2s;
+    width: 6px;
+    height: 6px;
+    background-color: var(--gold-main);
+    box-shadow: 0 0 10px var(--gold-main);
+    /* Glow instead of border */
+    border-radius: 50%;
+    margin-bottom: 8px;
+    transition: all 0.2s;
 }
 
 .node-text {
     color: var(--gold-main);
-    font-size: 13px;
-    text-shadow: 1px 1px 0 #000; 
-    letter-spacing: 2px;
-    opacity: 0.9;
-}
-
-/* Interactive States */
-.node-link.is-active .node-dot,
-.node-link:hover .node-dot {
-    background-color: var(--gold-bright);
-    transform: scale(1.5);
-    box-shadow: 0 0 15px var(--gold-main);
-    border-color: #fff;
-}
-
-.node-link.is-active .node-text,
-.node-link:hover .node-text {
-    color: #fff;
-    opacity: 1;
-    text-shadow: 0 0 10px var(--gold-main);
-}
-
-/* --- LIST VIEW --- */
-#list-container {
-    position: absolute;
-    /* Push top down slightly to ensure header clearance */
-    top: 160px; 
-    
-    /* FIX: Anchor to bottom. This creates a "No Fly Zone" 
-       at the bottom of the screen for the controls. */
-    bottom: 140px; 
-    
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 600px;
-    
-    /* Remove calculated height, let top/bottom define it */
-    height: auto; 
-    
-    overflow-y: auto;
-    z-index: 25;
-    pointer-events: auto;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    
-    /* Scrollbar styling */
-    scrollbar-width: thin;
-    scrollbar-color: var(--gold-dark) #000;
-    padding-right: 10px; 
-}
-
-#list-container.hidden {
-    opacity: 0;
-    pointer-events: none;
-    display: none;
-}
-
-#project-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.list-item {
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.6);
-    transition: all 0.2s ease;
-    cursor: pointer;
-    margin-bottom: 5px;
-}
-
-.list-item:hover, .list-item.is-selected {
-    background: rgba(212, 175, 55, 0.15);
-    border-left: 4px solid var(--gold-main);
-    padding-left: 16px;
-}
-
-.list-item-text {
-    color: var(--gold-main);
-    font-size: 1.1rem;
+    font-size: 12px;
     letter-spacing: 1px;
+    opacity: 0.8;
 }
 
-.list-item-arrow {
-    color: var(--gold-dark);
-    font-size: 0.8rem;
+.node-link:hover .node-dot,
+.node-link.is-active .node-dot {
+    background-color: #FFF;
+    transform: scale(2);
+    box-shadow: 0 0 20px var(--gold-main);
+}
+
+.node-link:hover .node-text,
+.node-link.is-active .node-text {
+    color: #FFF;
+    opacity: 1;
 }
 
 /* --- PREVIEW SIDEBAR --- */
@@ -333,176 +265,148 @@ canvas {
     position: fixed;
     top: 0;
     right: 0;
-    width: 400px; /* Default width */
-    min-width: 300px;
-    max-width: 90vw;
+    width: 50vw;
+    /* Wider preview */
     height: 100vh;
-    height: 100dvh;
-    background: rgba(8, 8, 8, 0.98);
-    border-left: 1px solid var(--gold-dark);
-    z-index: 50;
+    background: #000;
+    border-left: 2px solid var(--border-color);
+    z-index: 3000;
+    /* Highest priority */
     transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.3s cubic-bezier(0, 0, 0, 1);
     display: flex;
     flex-direction: column;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
 }
 
 #preview-sidebar.active {
     transform: translateX(0);
 }
 
-/* RESIZE HANDLE */
 #resize-handle {
     position: absolute;
     left: 0;
     top: 0;
-    bottom: 0;
     width: 10px;
+    height: 100%;
     cursor: col-resize;
-    z-index: 60;
-    background: transparent;
+    z-index: 50;
+    /* transparent */
 }
 
-#resize-handle:hover {
-    background: rgba(212, 175, 55, 0.2);
-}
-
+/* ... existing header/content rules ... */
 .preview-header {
-    padding: 20px;
-    border-bottom: 1px solid var(--gold-dark);
+    background: var(--gold-main);
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(90deg, rgba(212, 175, 55, 0.05), transparent);
 }
 
 #preview-title {
-    color: var(--gold-main);
-    font-size: 1.1rem;
+    color: #000;
     margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 60%; 
-}
-
-.preview-controls {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
+    font-size: 1rem;
 }
 
 .preview-btn {
-    background: transparent;
-    border: 1px solid var(--gold-dark);
-    color: var(--gold-main);
-    font-family: "Audiowide", sans-serif;
+    border: 1px solid #000;
+    color: #000;
+    padding: 5px 15px;
     font-size: 0.7rem;
-    padding: 5px 10px;
-    cursor: pointer;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: all 0.2s;
+    font-weight: bold;
 }
 
 .preview-btn:hover {
-    background: var(--gold-main);
-    color: #000;
+    background: #000;
+    color: var(--gold-main);
 }
 
 .preview-content {
     flex-grow: 1;
     position: relative;
-    overflow: hidden;
-    background: #000; 
+    background: #111;
+    user-select: auto;
+    pointer-events: auto;
 }
+
+/* Hide loader when container is loaded */
+.preview-content.is-loaded .iframe-loader {
+    display: none;
+}
+
+#preview-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
+    /* Removed cursor: auto and potentially transition/opacity to debug */
+}
+
+
 
 .iframe-loader {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: var(--gold-dark);
-    font-family: "Audiowide", sans-serif;
-    z-index: 1; 
+    color: var(--gold-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+    /* Ensure on top of frame when visible */
+    pointer-events: none;
+    /* CRITICAL: Prevent blocking iframe interaction */
 }
 
-#preview-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: #fff;
-    opacity: 0;
-    transition: opacity 0.5s;
-    z-index: 2; 
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 2px solid #333;
+    border-top-color: var(--gold-main);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
 }
 
-#preview-frame.loaded {
-    opacity: 1;
-}
-
-/* --- MOBILE RESPONSIVENESS --- */
-@media (max-width: 850px) {
-    #ui-layer { padding: 20px 10px; }
-    h1 {
-        font-size: 2.2rem;
-        letter-spacing: 2px;
-        background: none;
-        -webkit-text-fill-color: initial;
-        color: var(--gold-main);
-        text-shadow: 0 2px 0 #000;
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
-    .subtitle { font-size: 0.7rem; letter-spacing: 3px; }
-    
-    /* Search moves to top center */
-    .search-container {
-        position: relative;
-        top: 0;
-        left: 0;
-        margin: 10px auto;
-        display: flex;
-        justify-content: center;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    #ui-layer {
         width: 100%;
+        height: auto;
+        position: relative;
+        z-index: 2000;
     }
-    #search-input { width: 80%; max-width: 300px; }
-    
-    /* List View adjustments */
-    #list-container {
-        top: 180px; /* Push down further on mobile for the search bar */
-        bottom: 140px; /* Maintain the safety gap at the bottom */
-        height: auto; /* Override the old height calculation */
-    }
-    
-    /* Compact Controls */
-    .button-group {
-        padding: 5px 10px;
-        gap: 5px;
-    }
-    button {
-        font-size: 0.65rem;
-        padding: 8px 10px;
-    }
-    
-    .footer { display: none; }
-    
-    /* Sidebar mobile overrides */
-    #preview-sidebar { 
-        width: 100% !important; 
-        max-width: 100%; 
-    }
-    #resize-handle { display: none; } 
-}
 
-@media (max-width: 600px) {
-    #preview-sidebar { display: none; } /* Hide unless explicitly triggered, usually safer on small phones to link out */
-}
+    canvas {
+        left: 0 !important;
+        width: 100% !important;
+        top: auto;
+        height: 60vh !important;
+        bottom: 0;
+        position: fixed;
+    }
 
-@media (prefers-reduced-motion: reduce) {
-    .node-link { transition: none; }
+    #scene-container {
+        left: 50% !important;
+        top: 50% !important;
+    }
+
+    .sidebar-panel {
+        height: auto;
+        padding-bottom: 20px;
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .footer {
+        display: none;
+    }
 }

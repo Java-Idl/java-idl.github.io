@@ -1,62 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Javagar's Projects</title>
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23080808%22/><text x=%2250%22 y=%2275%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2270%22 fill=%22%23D4AF37%22 text-anchor=%22middle%22>J</text><rect x=%225%22 y=%225%22 width=%2290%22 height=%2290%22 rx=%2215%22 fill=%22none%22 stroke=%22%23D4AF37%22 stroke-width=%225%22/></svg>">
+    <title>Javagar's Command Center</title>
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23080808%22/><text x=%2250%22 y=%2275%22 font-family=%22sans-serif%22 font-weight=%22bold%22 font-size=%2270%22 fill=%22%23D4AF37%22 text-anchor=%22middle%22>J</text><rect x=%225%22 y=%225%22 width=%2290%22 height=%2290%22 rx=%2215%22 fill=%22none%22 stroke=%22%23D4AF37%22 stroke-width=%225%22/></svg>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Fascinate+Inline&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Fascinate+Inline&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
+    <!-- Sidebar Panel (The Command Center) -->
     <div id="ui-layer">
-        <div class="top-section">
+        <aside class="sidebar-panel">
             <header>
-                <h1 class="fascinate-font">Javagar's Projects</h1>
-                <div class="subtitle audiowide-font">Link Page</div>
+                <h1 class="fascinate-font">JAVAGAR'S</h1>
+                <div class="subtitle audiowide-font">PROJECTS</div>
             </header>
 
             <div class="search-container">
-                <input type="text" id="search-input" placeholder="Search Node..." autocomplete="off">
+                <label for="search-input" class="sr-only">Search Nodes</label>
+                <input type="text" id="search-input" placeholder="> SEARCH_NODE..." autocomplete="off">
             </div>
-        </div>
-        
-        <div class="controls">
-            <button id="toggle-view" aria-pressed="false">Switch to List</button>
-            <button id="toggle-motion" aria-pressed="false">Pause Motion</button>
-            <div class="footer audiowide-font" style="margin-top: 15px; font-size: 0.65rem; color: #666; letter-spacing: 1px;">
-                [ J / K ] NAVIGATE | [ CLICK ] View
+
+            <div class="controls">
+                <button id="toggle-view" aria-pressed="false">SWITCH VIEW</button>
+                <button id="toggle-motion" aria-pressed="false">PAUSE MOTION</button>
             </div>
-        </div>
+
+            <div id="list-container" class="hidden" role="region" aria-label="Project List">
+                <ul id="project-list" role="list"></ul>
+            </div>
+
+            <div class="footer audiowide-font">
+                KEYBOARD INPUTS<br>
+                [ J / K ] NAVIGATE<br>
+                [ CLICK ] EXECUTE
+            </div>
+        </aside>
     </div>
 
-    <aside id="preview-sidebar">
-        <div id="resize-handle"></div> <div class="preview-header">
+    <!-- Preview Panel (Right Side Slide-in) -->
+    <aside id="preview-sidebar" aria-label="Project Preview">
+        <div id="resize-handle" title="Resize Sidebar"></div>
+        <div class="preview-header">
             <h2 id="preview-title" class="audiowide-font">Project Name</h2>
             <div class="preview-controls">
                 <a id="preview-link" href="#" target="_blank" class="preview-btn">OPEN FULL</a>
-                <button id="close-preview" class="preview-btn">×</button>
+                <button id="close-preview" class="preview-btn" aria-label="Close Preview">×</button>
             </div>
         </div>
         <div class="preview-content">
-            <div class="iframe-loader">Loading...</div>
+            <div class="iframe-loader">
+                <div class="spinner"></div>
+                <span>Establishing Link...</span>
+            </div>
             <iframe id="preview-frame" title="Website Preview"></iframe>
         </div>
     </aside>
 
     <div id="scene-container"></div>
-    <canvas id="connections"></canvas>
-
-    <div id="list-container" class="hidden">
-        <ul id="project-list"></ul>
-    </div>
+    <canvas id="connections" role="img" aria-label="Interactive 3D network of project links."></canvas>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
