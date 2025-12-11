@@ -2,7 +2,10 @@ const canvas = document.getElementById('connections');
 const ctx = canvas.getContext('2d');
 const scene = document.getElementById('scene-container');
 const motionBtn = document.getElementById('toggle-motion');
+const viewBtn = document.getElementById('toggle-view');
 const searchInput = document.getElementById('search-input');
+const listContainer = document.getElementById('list-container');
+const projectListUl = document.getElementById('project-list');
 
 // --- Preview Pane Elements ---
 const previewSidebar = document.getElementById('preview-sidebar');
@@ -10,16 +13,18 @@ const previewFrame = document.getElementById('preview-frame');
 const previewTitle = document.getElementById('preview-title');
 const previewLink = document.getElementById('preview-link');
 const closePreviewBtn = document.getElementById('close-preview');
+const resizeHandle = document.getElementById('resize-handle');
 let previewDebounceTimer = null;
 
 // --- Configuration ---
 const config = {
     sphereRadius: 280,
-    baseRotationSpeed: 0.002,
-    mouseSensitivity: 0.00008, 
+    baseRotationSpeed: 0.0002,
+    mouseSensitivity: 0.000008, 
     perspective: 800,
     connectionDistance: 120,
-    isPaused: false
+    isPaused: false,
+    viewMode: '3d' // '3d' or 'list'
 };
 
 const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -40,6 +45,7 @@ let searchedPoint = null;
 let isSearchHovering = false; 
 let currentRotX = 0;
 let currentRotY = 0;
+let navigationIndex = -1; // For J/K Navigation
 
 // --- Load Data ---
 fetch('links.yaml')
@@ -53,6 +59,9 @@ fetch('links.yaml')
 class Point {
     constructor(data, id, total) {
         this.data = data;
+        this.id = id;
+        
+        // Sphere Math
         const phi = Math.acos(1 - 2 * (id + 0.5) / total);
         const theta = Math.PI * (1 + Math.sqrt(5)) * (id + 0.5);
         this.x = config.sphereRadius * Math.sin(phi) * Math.cos(theta);
@@ -62,45 +71,35 @@ class Point {
         this.screenY = 0;
         this.alpha = 1;
 
+        // 3D DOM Element
         this.element = document.createElement('a');
         this.element.href = data.url;
         this.element.className = 'node-link';
-        // We remove target="_blank" behavior in JS, but keep it in HTML for fallback
         this.element.target = "_blank"; 
-        this.element.setAttribute('aria-label', `Visit ${data.text}`);
         
         this.element.innerHTML = `
             <div class="node-dot"></div>
             <span class="node-text">${data.text}</span>
         `;
 
-        // --- Event Listeners ---
-
-        // CLICK: Open immediately
         this.element.addEventListener('click', (e) => {
-            e.preventDefault(); // Stop normal navigation
-            focusedPoint = this;
-            config.isPaused = true;
-            loadPreviewNow(this.data);
-        });
-
-        // FOCUS: Open with delay (Debounce) to prevent lag while tabbing
-        this.element.addEventListener('focus', () => {
-            focusedPoint = this;
-            config.isPaused = true; 
-            schedulePreview(this.data);
-        });
-
-        this.element.addEventListener('blur', () => {
-            focusedPoint = null;
-            if (!mediaQuery.matches && motionBtn.innerText === "PAUSE MOTION") {
-                config.isPaused = false;
-            }
-            // Cancel any pending preview load if user tabs away quickly
-            clearTimeout(previewDebounceTimer);
+            e.preventDefault();
+            selectProject(this);
         });
 
         scene.appendChild(this.element);
+
+        // List DOM Element
+        this.listItem = document.createElement('li');
+        this.listItem.className = 'list-item';
+        this.listItem.innerHTML = `
+            <span class="list-item-text">${data.text}</span>
+            <span class="list-item-arrow">OPEN &gt;</span>
+        `;
+        this.listItem.addEventListener('click', () => {
+            selectProject(this);
+        });
+        projectListUl.appendChild(this.listItem);
     }
 
     rotate(angleX, angleY) {
@@ -118,18 +117,20 @@ class Point {
     }
 
     updateDOM() {
+        // Only update if in 3D mode
+        if (config.viewMode !== '3d') return;
+
         const scale = config.perspective / (config.perspective - this.z);
         this.screenX = this.x * scale; 
         this.screenY = this.y * scale; 
-        this.alpha = Math.max(0.2, (this.z + config.sphereRadius) / (2 * config.sphereRadius));
+        this.alpha = Math.max(0.1, (this.z + config.sphereRadius) / (2 * config.sphereRadius));
 
         this.element.style.transform = `translate3d(${this.screenX}px, ${this.screenY}px, 0) scale(${scale}) translate(-50%, -50%)`;
         this.element.style.opacity = this.alpha;
         this.element.style.zIndex = Math.floor(this.z + config.sphereRadius) + 100;
         
-        const blurAmount = Math.max(0, (config.sphereRadius - this.z) / 80);
-        this.element.style.filter = `blur(${blurAmount}px)`;
-        this.element.style.visibility = 'visible';
+        // PERFORMANCE: Removed dynamic filter: blur(). 
+        // We use Opacity and Scale for depth now.
     }
 }
 
@@ -139,6 +140,57 @@ function init() {
     loop();
 }
 
+function selectProject(point) {
+    // Universal Selection Logic (handles both 3D and List clicks)
+    focusedPoint = point;
+    navigationIndex = point.id;
+    
+    // Highlight in 3D
+    points.forEach(p => p.element.classList.remove('is-active'));
+    point.element.classList.add('is-active');
+
+    // Highlight in List
+    points.forEach(p => p.listItem.classList.remove('is-selected'));
+    point.listItem.classList.add('is-selected');
+    point.listItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    config.isPaused = true;
+    motionBtn.textContent = "Resume Motion";
+    loadPreviewNow(point.data);
+}
+
+// --- J / K Navigation ---
+function navigate(direction) {
+    if (points.length === 0) return;
+
+    if (direction === 'next') {
+        navigationIndex = (navigationIndex + 1) % points.length;
+    } else {
+        navigationIndex = (navigationIndex - 1 + points.length) % points.length;
+    }
+
+    const target = points[navigationIndex];
+    selectProject(target);
+}
+
+// --- View Toggling ---
+viewBtn.addEventListener('click', () => {
+    if (config.viewMode === '3d') {
+        config.viewMode = 'list';
+        viewBtn.textContent = "Switch to Sphere";
+        document.body.classList.add('hidden-3d');
+        listContainer.classList.remove('hidden');
+        listContainer.style.display = 'block';
+    } else {
+        config.viewMode = '3d';
+        viewBtn.textContent = "Switch to List";
+        document.body.classList.remove('hidden-3d');
+        listContainer.classList.add('hidden');
+        setTimeout(() => listContainer.style.display = 'none', 300);
+        loop(); // Restart loop if it was paused effectively
+    }
+});
+
 function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
@@ -147,13 +199,11 @@ function resize() {
     const isPortrait = width < height;
     const multiplier = isPortrait ? 0.42 : 0.35;
     config.sphereRadius = Math.min(width, height) * multiplier;
-    if (!isMouseOver) {
-        mouseX = cx;
-        mouseY = cy;
-    }
 }
 
 function drawConnections() {
+    if (config.viewMode !== '3d') return; // Skip in list mode
+
     ctx.clearRect(0, 0, width, height);
     ctx.save();
     ctx.translate(cx, cy);
@@ -181,29 +231,14 @@ function drawConnections() {
 }
 
 // --- Preview Logic ---
-
-function schedulePreview(data) {
-    // Cancel any existing timer
-    clearTimeout(previewDebounceTimer);
-    // Wait 800ms before loading. If user tabs away, 'blur' will clear this.
-    previewDebounceTimer = setTimeout(() => {
-        loadPreviewNow(data);
-    }, 800);
-}
-
 function loadPreviewNow(data) {
-    clearTimeout(previewDebounceTimer);
-    
-    // Update Sidebar UI
     previewTitle.textContent = data.text;
     previewLink.href = data.url;
     previewSidebar.classList.add('active');
 
-    // Only load if it's a new URL (prevents reloading on repeated clicks)
     if (previewFrame.getAttribute('src') !== data.url) {
-        previewFrame.classList.remove('loaded'); // Hide until loaded
+        previewFrame.classList.remove('loaded');
         previewFrame.src = data.url;
-        
         previewFrame.onload = () => {
             previewFrame.classList.add('loaded');
         };
@@ -212,97 +247,110 @@ function loadPreviewNow(data) {
 
 function closePreview() {
     previewSidebar.classList.remove('active');
-    
-    // Clear iframe source after animation to free memory/CPU
     setTimeout(() => {
         previewFrame.src = ''; 
         previewFrame.classList.remove('loaded');
     }, 500);
 }
 
-// Close preview when clicking X
 closePreviewBtn.addEventListener('click', closePreview);
 
-// Close preview when clicking outside sidebar and nodes
+// Close preview when clicking outside
 window.addEventListener('click', (e) => {
     const isNode = e.target.closest('.node-link');
+    const isList = e.target.closest('.list-item');
     const isSidebar = e.target.closest('#preview-sidebar');
-    if (!isNode && !isSidebar) {
+    const isControl = e.target.closest('.controls');
+    const isSearch = e.target.closest('.search-container');
+    
+    if (!isNode && !isSidebar && !isList && !isControl && !isSearch) {
         closePreview();
     }
 });
 
+// --- Resizable Sidebar Logic ---
+let isResizing = false;
 
-// --- Existing Event Listeners ---
+resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.body.style.cursor = 'col-resize';
+    e.preventDefault(); // Prevent text selection
+});
 
-searchInput.addEventListener('mouseenter', () => { isSearchHovering = true; });
-searchInput.addEventListener('mouseleave', () => { isSearchHovering = false; });
-searchInput.addEventListener('touchstart', () => { isSearchHovering = true; }, {passive: true});
-searchInput.addEventListener('touchend', () => { setTimeout(() => isSearchHovering = false, 5000); });
+window.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    // Calculate new width: Window Width - Mouse X
+    let newWidth = window.innerWidth - e.clientX;
+    // Constraints
+    if (newWidth < 300) newWidth = 300;
+    if (newWidth > window.innerWidth * 0.8) newWidth = window.innerWidth * 0.8;
+    
+    previewSidebar.style.width = `${newWidth}px`;
+});
 
-searchInput.addEventListener('input', (e) => {
-    const val = e.target.value.toLowerCase().trim();
-    points.forEach(p => p.element.classList.remove('is-searched'));
-    searchedPoint = null;
-    if (val.length >= 2) {
-        const match = points.find(p => p.data.text.toLowerCase().includes(val));
-        if (match) {
-            searchedPoint = match;
-            match.element.classList.add('is-searched');
-        }
+window.addEventListener('mouseup', () => {
+    if (isResizing) {
+        isResizing = false;
+        document.body.style.cursor = '';
     }
 });
 
+
+// --- Loop ---
 function loop() {
+    if (config.viewMode !== '3d') {
+        requestAnimationFrame(loop);
+        return;
+    }
+
     let targetRotX = 0;
     let targetRotY = 0;
     const activeTarget = focusedPoint || searchedPoint;
+    
     if (activeTarget) {
         const k = 0.05; 
         targetRotY = Math.atan2(activeTarget.x, activeTarget.z) * k;
         targetRotX = Math.atan2(activeTarget.y, activeTarget.z) * k;
-    } else if (isSearchHovering) {
-        targetRotY = 0.005; 
-        targetRotX = 0; 
     } else if (!config.isPaused) {
+        // Auto rotation
         if (isMouseOver) {
+             // Gentle mouse influence
             targetRotY = (mouseX - cx) * config.mouseSensitivity;
             targetRotX = (mouseY - cy) * config.mouseSensitivity;
-            let nearestDist = Infinity;
-            points.forEach(p => {
-                if (p.z > 0) { 
-                    const dx = mouseX - (cx + p.screenX);
-                    const dy = mouseY - (cy + p.screenY);
-                    const d = Math.sqrt(dx*dx + dy*dy);
-                    if (d < nearestDist) nearestDist = d;
-                }
-            });
-            const brakeThreshold = 120;
-            if (nearestDist < brakeThreshold) {
-                const brakeFactor = Math.max(0.05, nearestDist / brakeThreshold);
-                targetRotY *= brakeFactor;
-                targetRotX *= brakeFactor;
-            }
         } else {
             targetRotY = config.baseRotationSpeed;
         }
     }
+
     const smoothness = 0.05;
     currentRotX += (targetRotX - currentRotX) * smoothness;
     currentRotY += (targetRotY - currentRotY) * smoothness;
+
     points.forEach(p => {
         p.rotate(currentRotX, currentRotY);
         p.updateDOM();
     });
+    
     drawConnections();
     requestAnimationFrame(loop);
 }
 
+// --- Inputs ---
+searchInput.addEventListener('input', (e) => {
+    const val = e.target.value.toLowerCase().trim();
+    points.forEach(p => p.element.classList.remove('is-active'));
+    searchedPoint = null;
+    if (val.length >= 2) {
+        const match = points.find(p => p.data.text.toLowerCase().includes(val));
+        if (match) {
+            selectProject(match); // Auto select closest match
+        }
+    }
+});
+
 window.addEventListener('resize', resize);
 window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; isMouseOver = true; });
 window.addEventListener('mouseout', () => { isMouseOver = false; });
-window.addEventListener('touchmove', e => { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; isMouseOver = true; }, {passive: true});
-window.addEventListener('touchend', () => { isMouseOver = false; });
 
 motionBtn.addEventListener('click', () => {
     config.isPaused = !config.isPaused;
@@ -310,16 +358,14 @@ motionBtn.addEventListener('click', () => {
     motionBtn.setAttribute('aria-pressed', config.isPaused);
 });
 
+// Keyboard Navigation
 window.addEventListener('keydown', (e) => {
-    if (e.key === 'Tab') {
-        const interactiveElements = [searchInput, motionBtn, ...document.querySelectorAll('.node-link')];
-        const first = interactiveElements[0];
-        const last = interactiveElements[interactiveElements.length - 1];
-        if (e.shiftKey) {
-            if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-        } else {
-            if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-        }
+    if (e.target === searchInput) return; // Don't nav while typing
+
+    if (e.key === 'j' || e.key === 'J') {
+        navigate('next');
+    } else if (e.key === 'k' || e.key === 'K') {
+        navigate('prev');
     } else if (e.key === 'Escape') {
         closePreview();
     }
