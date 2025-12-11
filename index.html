@@ -27,14 +27,16 @@
         </div>
         
         <div class="controls">
+            <button id="toggle-view" aria-pressed="false">Switch to List</button>
             <button id="toggle-motion" aria-pressed="false">Pause Motion</button>
             <div class="footer audiowide-font" style="margin-top: 15px; font-size: 0.65rem; color: #666; letter-spacing: 1px;">
-                [ TAB ] NAVIGATE | [ CLICK ] View
+                [ J / K ] NAVIGATE | [ CLICK ] View
             </div>
         </div>
     </div>
+
     <aside id="preview-sidebar">
-        <div class="preview-header">
+        <div id="resize-handle"></div> <div class="preview-header">
             <h2 id="preview-title" class="audiowide-font">Project Name</h2>
             <div class="preview-controls">
                 <a id="preview-link" href="#" target="_blank" class="preview-btn">OPEN FULL</a>
@@ -46,12 +48,15 @@
             <iframe id="preview-frame" title="Website Preview"></iframe>
         </div>
     </aside>
+
     <div id="scene-container"></div>
     <canvas id="connections"></canvas>
 
+    <div id="list-container" class="hidden">
+        <ul id="project-list"></ul>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-    
     <script src="script.js"></script>
 </body>
-
 </html>
