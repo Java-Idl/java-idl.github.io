@@ -28,3 +28,5 @@
   url: "https://javagar-convertor.vercel.app/"
 - text: "Terminal Pastebin"
   url: "https://terminal-pastebin.kudos-kebab-kept.workers.dev/"
+- text: "Pass Compare"
+  url: "https://passcompare.kudos-kebab-kept.workers.dev/"
