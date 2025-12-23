@@ -30,3 +30,5 @@
   url: "https://terminal-pastebin.kudos-kebab-kept.workers.dev/"
 - text: "Pass Compare"
   url: "https://passcompare.kudos-kebab-kept.workers.dev/"
+- text: "Mitigate BadUSB"
+  url: "https://java-idl.github.io/mitigate-badusb/"
