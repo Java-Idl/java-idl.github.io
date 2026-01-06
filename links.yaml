@@ -32,3 +32,5 @@
   url: "https://passcompare.kudos-kebab-kept.workers.dev/"
 - text: "Mitigate BadUSB"
   url: "https://java-idl.github.io/mitigate-badusb/"
+- text: "Attendance"
+  url: "https://java-idl.github.io/recoverySim/"
