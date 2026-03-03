@@ -18,60 +18,68 @@
 </head>
 
 <body>
+    <div id="app-shell">
+        <main id="main-panel" aria-label="Projects Workspace">
+            <section id="content-area" aria-label="Main Content">
+                <div id="scene-host" aria-label="Interactive 3D project sphere">
+                    <div id="scene-container"></div>
+                    <canvas id="connections" role="img" aria-label="Interactive 3D network of project links."></canvas>
+                </div>
+            </section>
 
-    <!-- Sidebar Panel (The Command Center) -->
-    <div id="ui-layer">
-        <aside class="sidebar-panel">
-            <header>
-                <h1 class="fascinate-font">JAVAGAR'S</h1>
-                <div class="subtitle audiowide-font">PROJECTS</div>
-            </header>
+            <aside id="preview-sidebar" aria-label="Project Preview">
+                <div id="resize-handle" title="Resize Preview Panel"></div>
+                <div class="preview-header">
+                    <h2 id="preview-title" class="audiowide-font">Project Name</h2>
+                    <div class="preview-controls">
+                        <button id="retry-preview" class="preview-btn" type="button" aria-label="Retry Preview">RETRY</button>
+                        <button id="fullscreen-preview" class="preview-btn" type="button" aria-pressed="false" aria-label="Fullscreen Preview">FULLSCREEN</button>
+                        <a id="preview-link" href="#" target="_blank" class="preview-btn">OPEN FULL</a>
+                        <button id="close-preview" class="preview-btn" aria-label="Close Preview" aria-keyshortcuts="Escape Q X" title="Close (Esc / Q / X)">×</button>
+                    </div>
+                </div>
+                <div class="preview-content">
+                    <div class="iframe-loader">
+                        <div class="spinner"></div>
+                        <span>Establishing Link...</span>
+                    </div>
+                    <iframe id="preview-frame" title="Website Preview"></iframe>
+                </div>
+            </aside>
+        </main>
 
-            <div class="search-container">
-                <label for="search-input" class="sr-only">Search Nodes</label>
-                <input type="text" id="search-input" placeholder="> SEARCH_NODE..." autocomplete="off">
+        <div id="hud-layer" aria-label="Controls">
+            <h1 class="hud-title fascinate-font">JAVAGAR'S</h1>
+
+            <button id="chip-search" class="hud-chip" type="button" aria-expanded="false">SEARCH</button>
+            <button id="chip-mode" class="hud-chip" type="button" aria-pressed="false">LIST</button>
+            <button id="chip-motion" class="hud-chip" type="button" aria-pressed="false">PAUSE</button>
+        </div>
+
+        <div id="search-popover" class="hud-popover" aria-hidden="true">
+            <div id="search-resize-handle" title="Resize Search Panel"></div>
+            <label for="search-input" class="sr-only">Search Projects</label>
+            <input type="text" id="search-input" placeholder="> SEARCH_PROJECT..." autocomplete="off">
+        </div>
+
+        <section id="list-sheet" aria-label="Project List" aria-hidden="true">
+            <div id="sheet-resize-handle" title="Resize List Panel"></div>
+            <div class="sheet-header">
+                <span class="audiowide-font">PROJECTS</span>
+                <button id="close-sheet" class="sheet-close" type="button">CLOSE</button>
             </div>
+            <ul id="project-list" role="list"></ul>
+        </section>
 
-            <div class="controls">
-                <button id="toggle-view" aria-pressed="false">SWITCH VIEW</button>
-                <button id="toggle-motion" aria-pressed="false">PAUSE MOTION</button>
-            </div>
+        <div class="hint hud-hint audiowide-font">J / K NAVIGATE · ENTER OPEN · ESC/Q/X CLOSE</div>
+        <div id="status-live" class="sr-only" aria-live="polite"></div>
 
-            <div id="list-container" class="hidden" role="region" aria-label="Project List">
-                <ul id="project-list" role="list"></ul>
-            </div>
-
-            <div class="footer audiowide-font">
-                KEYBOARD INPUTS<br>
-                [ J / K ] NAVIGATE<br>
-                [ CLICK ] EXECUTE
-            </div>
-        </aside>
+        <div id="kao-corner-banner" aria-label="Keep Android Open notice"></div>
+        <div id="drag-shield" aria-hidden="true"></div>
     </div>
 
-    <!-- Preview Panel (Right Side Slide-in) -->
-    <aside id="preview-sidebar" aria-label="Project Preview">
-        <div id="resize-handle" title="Resize Sidebar"></div>
-        <div class="preview-header">
-            <h2 id="preview-title" class="audiowide-font">Project Name</h2>
-            <div class="preview-controls">
-                <a id="preview-link" href="#" target="_blank" class="preview-btn">OPEN FULL</a>
-                <button id="close-preview" class="preview-btn" aria-label="Close Preview">×</button>
-            </div>
-        </div>
-        <div class="preview-content">
-            <div class="iframe-loader">
-                <div class="spinner"></div>
-                <span>Establishing Link...</span>
-            </div>
-            <iframe id="preview-frame" title="Website Preview"></iframe>
-        </div>
-    </aside>
-
-    <div id="scene-container"></div>
-    <canvas id="connections" role="img" aria-label="Interactive 3D network of project links."></canvas>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://keepandroidopen.org/banner.js?size=mini&id=kao-corner-banner&link=https%3A%2F%2Fkeepandroidopen.org"></script>
     <script src="script.js"></script>
 </body>
 
