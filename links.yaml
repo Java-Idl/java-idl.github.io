@@ -4,8 +4,8 @@
   url: "https://authenticator.kudos-kebab-kept.workers.dev/"
 # - text: "Bio Audio Research"
 #   url: "https://bio-audio-research.kudos-kebab-kept.workers.dev/"
-- text: "Neon Blob Jump"
-  url: "https://neon-blob-jump.kudos-kebab-kept.workers.dev/"
+# - text: "Neon Blob Jump"
+#   url: "https://neon-blob-jump.kudos-kebab-kept.workers.dev/"
 # - text: "Digital Garden"
 #   url: "https://digital-garden.kudos-kebab-kept.workers.dev/"
 # - text: "Shift Context"
@@ -38,4 +38,5 @@
   url: "https://chatboard-7fc.pages.dev/"
 - text: "Git To Doc"
   url: "https://git2doc.pages.dev/"
+
 
