@@ -2,8 +2,16 @@
 sync-and-push.ps1
 sync-and-push.bat
 task.md
+purge-lovable.ps1
 .agent/
 .agent
+out.txt
+
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
 
 # Operating system files
 Thumbs.db
