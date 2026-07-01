@@ -74,7 +74,7 @@ export class SphereEngine {
     this.state.points = projects.map((data, id) => {
       const phi = Math.acos(1 - (2 * (id + 0.5)) / total);
       const theta = Math.PI * (1 + Math.sqrt(5)) * (id + 0.5);
-      const safeUrl = normalizeSafeUrl(data.url);
+      const safeUrl = data.safeUrl ?? null;
 
       const element = document.createElement("a");
       element.className = `node-link node-link--${data.importance || "medium"}`;
@@ -365,7 +365,9 @@ export class SphereEngine {
       this.state.dragVelocityY = 0;
       try {
         this.canvas.setPointerCapture(event.pointerId);
-      } catch (e) {}
+      } catch (e) {
+        console.warn("setPointerCapture failed:", e);
+      }
     };
 
     const onPointerMove = (event) => {
@@ -397,8 +399,9 @@ export class SphereEngine {
         this.state.isDragging = false;
         try {
           this.canvas.releasePointerCapture(event.pointerId);
-        } catch (e) {}
-
+        } catch (e) {
+          console.warn("releasePointerCapture failed:", e);
+        }
         this.state.currentRotY = this.state.dragVelocityY;
         this.state.currentRotX = this.state.dragVelocityX;
       }

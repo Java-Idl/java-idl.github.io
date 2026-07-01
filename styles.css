@@ -49,7 +49,7 @@ body {
     linear-gradient(var(--grid-color) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 48px 48px;
-  overflow: hidden;
+  /* overflow: hidden removed — allows browser zoom/reflow fallback (WCAG 1.4.10) */
 }
 
 h1,
@@ -81,6 +81,7 @@ h4 {
   grid-template-columns: minmax(0, 1fr) 0;
   height: 100vh;
   width: 100vw;
+  overflow: hidden;
   transition: grid-template-columns 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -108,9 +109,15 @@ h4 {
   gap: 16px;
   padding: 14px 20px;
   border-bottom: 1px solid var(--border);
-  background: oklch(6% 0.008 76 / 0.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: oklch(6% 0.008 76); /* solid fallback for unsupported browsers */
+}
+
+@supports (backdrop-filter: blur(0)) {
+  .shell__bar {
+    background: oklch(6% 0.008 76 / 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }
 
 .shell__brand {
@@ -121,12 +128,13 @@ h4 {
 }
 
 .brand-logo {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   border: 1px solid var(--accent);
-  padding: 2px;
+  padding: 3px;
   background: var(--input-bg);
+  flex-shrink: 0;
 }
 
 .brand-name {
@@ -135,12 +143,7 @@ h4 {
   color: var(--foreground);
 }
 
-.brand-tag {
-  color: var(--muted);
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
+/* .brand-tag removed — class unused in HTML (L4) */
 
 .shell__chips {
   display: flex;
@@ -177,14 +180,23 @@ h4 {
   border-color: var(--accent);
 }
 
+/* Default (off) state: gold border + muted text — clearly different from active gold-fill */
 .chip--accent {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--muted);
 }
 
 .chip--accent:hover {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Active (on) state: full gold fill — distinct from off state */
+.chip--accent[aria-pressed="true"] {
   background: var(--accent);
   color: var(--accent-foreground);
+  border-color: var(--accent);
 }
 
 .shell__stage {
@@ -203,6 +215,13 @@ h4 {
 
 .shell--list-open .scene-host {
   pointer-events: none;
+  /* Dim the sphere when the list panel is open to visually separate them */
+  opacity: 0.35;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scene-host {
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .scene-container {
@@ -221,22 +240,16 @@ h4 {
   height: 100%;
 }
 
+/* Merged from two duplicate .node-link blocks (M3) */
 .node-link {
   position: absolute;
   transform-style: preserve-3d;
-  text-decoration: none;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 14px 10px;
-  will-change: transform, opacity;
-}
-
-.node-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 14px 10px;
+  will-change: transform, opacity;
   background-color: var(--surface);
   border: 1px solid var(--border);
   color: var(--foreground);
@@ -586,11 +599,13 @@ h4 {
   left: 16px;
   right: 16px;
   bottom: 16px;
-  max-height: 60vh;
+  max-height: 62vh;
   display: flex;
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--accent);
+  /* Subtle shadow to lift the panel off the sphere visually */
+  box-shadow: 0 -4px 32px oklch(0% 0 0 / 0.55), 0 0 0 1px var(--accent);
   z-index: 20;
   animation: panel-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -614,10 +629,11 @@ h4 {
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   padding: 6px 10px;
-  min-width: 200px;
+  flex: 1; /* grow to fill available space */
+  min-width: 0; /* allow shrinking below content-size to prevent overflow (L1) */
 }
 
-.list-search:focus {
+.list-search:focus-visible {
   border-color: var(--accent);
   outline: 2px solid var(--accent);
   outline-offset: -1px;
@@ -760,8 +776,8 @@ h4 {
   }
 
   .brand-logo {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   }
 
   .shell__chips {
@@ -774,7 +790,7 @@ h4 {
     padding: 8px 12px;
     font-size: 0.7rem;
     letter-spacing: 0.08em;
-    min-height: 38px;
+    min-height: 44px; /* restored to WCAG 2.5.5 minimum (H1) */
   }
 
   .list-sheet {
@@ -796,7 +812,7 @@ h4 {
   }
 
   .list-search {
-    min-width: 140px;
+    min-width: 0; /* prevent horizontal overflow on narrow screens (L1) */
     flex: 1;
   }
 
@@ -924,6 +940,37 @@ h4 {
   .onboard-hint__tips li::before {
     display: none;
   }
+}
+
+/* ====== Init Error State ====== */
+.init-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+  z-index: 10;
+}
+
+.init-error__msg {
+  font-family: "Audiowide", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.16em;
+  color: var(--danger);
+  text-transform: uppercase;
+  max-width: 36ch;
+}
+
+.init-error__sub {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+  max-width: 36ch;
 }
 
 /* ====== Utility ====== */

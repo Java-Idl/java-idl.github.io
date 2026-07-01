@@ -10,7 +10,13 @@
   <meta property="og:title" content="Javagar Prasath B">
   <meta property="og:description" content="Security tools, encryption utilities, and browser experiments by Javagar.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://java-idl.github.io/orbit-showcase/">
+  <meta property="og:image" content="pub/favicon.png">
   <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Javagar Prasath B">
+  <meta name="twitter:description" content="Security tools, encryption utilities, and browser experiments by Javagar.">
+  <meta name="theme-color" content="#0f0d09">
+  <meta name="apple-mobile-web-app-capable" content="yes">
 
   <link rel="icon" type="image/png" href="pub\favicon.png">
   <link rel="stylesheet" href="styles.css">
@@ -43,15 +49,22 @@
         </div>
 
         <!-- Onboarding Hint Overlay -->
-        <div id="onboard-hint" class="onboard-hint hidden" role="status" aria-label="Onboarding tips">
+        <div id="onboard-hint" class="onboard-hint hidden" role="region" aria-label="Onboarding tips">
           <ul class="onboard-hint__tips">
             <li>Click a node to open project</li>
             <li>Drag to rotate sphere</li>
             <li>Use LIST for keyboard access</li>
           </ul>
-          <button type="button" id="btn-onboard-dismiss" class="onboard-hint__btn" aria-label="Dismiss onboarding tips">
+          <button type="button" id="btn-onboard-dismiss" class="onboard-hint__btn" aria-label="Dismiss onboarding tips" title="Dismiss tips">
             Got it
           </button>
+        </div>
+
+        <!-- Init Error State -->
+        <div id="init-error" class="init-error hidden" role="alert">
+          <p class="init-error__msg">FAILED TO LOAD PROJECTS</p>
+          <p class="init-error__sub">Check your connection and try again.</p>
+          <button type="button" id="btn-init-retry" class="chip">RETRY</button>
         </div>
       </section>
 
@@ -63,7 +76,7 @@
             <input type="text" id="list-search" class="list-search" placeholder="> FILTER..."
               aria-label="Filter projects by name" />
             <button type="button" id="btn-list-close" class="panel-btn panel-btn--close"
-              aria-label="Close project list">✕</button>
+              aria-label="Close project list" title="Close project list">✕</button>
           </div>
         </header>
         <!-- Live region announces filter results to screen readers -->
@@ -94,7 +107,7 @@
             OPEN FULL
           </a>
           <button type="button" id="btn-preview-close" class="panel-btn panel-btn--close"
-            aria-label="Close preview">✕</button>
+            aria-label="Close preview" title="Close preview">✕</button>
         </div>
       </header>
       <div id="preview-content-wrapper" class="panel-content state-loading">
@@ -113,7 +126,7 @@
         <h2 class="panel-title">ABOUT</h2>
         <div class="panel-controls">
           <button type="button" id="btn-about-close" class="panel-btn panel-btn--close"
-            aria-label="Close about panel">✕</button>
+            aria-label="Close about panel" title="Close about panel">✕</button>
         </div>
       </header>
       <div class="panel-content state-loaded">

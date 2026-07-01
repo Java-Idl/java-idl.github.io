@@ -26,6 +26,6 @@ I have practical experience using the following tools and languages across vario
 ---
 
 ### Contact
-- **Email:** javagarprasath.b@gmail.com
+- **Email:** [javagarprasath.b@gmail.com](mailto:javagarprasath.b@gmail.com)
 - **GitHub:** [Java-Idl](https://github.com/Java-Idl)
 - **LinkedIn:** [Javagar Prasath](https://www.linkedin.com/in/javagar-prasath-928955284/)

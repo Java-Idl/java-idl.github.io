@@ -2,7 +2,14 @@ import { SphereEngine, normalizeSafeUrl } from "./sphere-engine.js";
 
 let projects = [];
 
-function parseMarkdown(md) {
+// Shared inline-markdown renderer (bold + links)
+function applyInlineMarkdown(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+}
+
+function parseMarkdown(md, headingOffset = 0) {
   const lines = md.split('\n');
   let html = '';
   let inList = false;
@@ -22,23 +29,18 @@ function parseMarkdown(md) {
     if (headingMatch) {
       if (inList) { html += '</ul>\n'; inList = false; }
       const level = headingMatch[1].length;
-      html += `<h${level}>${headingMatch[2]}</h${level}>\n`;
+      const hLevel = Math.min(6, level + headingOffset);
+      html += `<h${hLevel}>${headingMatch[2]}</h${hLevel}>\n`;
       continue;
     }
     const listMatch = line.match(/^[\-\*]\s+(.*)$/);
     if (listMatch) {
       if (!inList) { html += '<ul>\n'; inList = true; }
-      let content = listMatch[1]
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-      html += `  <li>${content}</li>\n`;
+      html += `  <li>${applyInlineMarkdown(listMatch[1])}</li>\n`;
       continue;
     }
     if (inList) { html += '</ul>\n'; inList = false; }
-    let content = line
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-    html += `<p>${content}</p>\n`;
+    html += `<p>${applyInlineMarkdown(line)}</p>\n`;
   }
   if (inList) html += '</ul>\n';
   return html;
@@ -303,6 +305,15 @@ function closeAboutPanel() {
   restoreFocus();
 }
 
+// Close List Sheet
+function closeListSheet() {
+  isListOpen = false;
+  listSheetEl.classList.add("hidden");
+  updateShellState();
+  disableFocusTrap();
+  restoreFocus();
+}
+
 // Toggle List Sheet
 function toggleListSheet() {
   isListOpen = !isListOpen;
@@ -319,9 +330,8 @@ function toggleListSheet() {
       enableFocusTrap(listSheetEl);
     }, 50);
   } else {
-    listSheetEl.classList.add("hidden");
-    disableFocusTrap();
-    restoreFocus();
+    closeListSheet();
+    return; // updateShellState already called inside closeListSheet
   }
   updateShellState();
 }
@@ -331,6 +341,9 @@ function initOnboarding() {
   const seen = localStorage.getItem(ONBOARD_STORAGE_KEY);
   if (!seen) {
     onboardHintEl.classList.remove("hidden");
+    // Announce to screen readers via always-present live region;
+    // elements transitioning from display:none don't self-announce via role=status.
+    srAnnouncerEl.textContent = "Tip: Click a node to open a project. Drag to rotate sphere. Use LIST for keyboard access.";
   }
 }
 
@@ -412,7 +425,7 @@ function renderProjectList(filterText = "") {
   if (filtered.length === 0) {
     const liEmpty = document.createElement("li");
     liEmpty.className = "list-empty";
-    liEmpty.role = "status";
+    liEmpty.setAttribute("role", "status");
     liEmpty.textContent = "NO MATCHING PROJECTS";
     listGridEl.appendChild(liEmpty);
   }
@@ -438,13 +451,7 @@ function renderProjectList(filterText = "") {
 
 // Bind Button Listeners
 btnListToggle.addEventListener("click", toggleListSheet);
-btnListClose.addEventListener("click", () => {
-  isListOpen = false;
-  listSheetEl.classList.add("hidden");
-  updateShellState();
-  disableFocusTrap();
-  restoreFocus();
-});
+btnListClose.addEventListener("click", closeListSheet);
 
 btnAboutToggle.addEventListener("click", () => {
   if (isAboutOpen) {
@@ -512,7 +519,7 @@ Promise.all([
     // Inject parsed about markdown
     const aboutMarkdownEl = document.querySelector(".about-markdown");
     if (aboutMarkdownEl) {
-      aboutMarkdownEl.innerHTML = parseMarkdown(aboutMd);
+      aboutMarkdownEl.innerHTML = parseMarkdown(aboutMd, 1); // offset headings: h2→h3, h3→h4 to avoid clash with panel <h2> title
     }
 
     // Initialize 3D Sphere Engine after loading projects
@@ -532,4 +539,9 @@ Promise.all([
   })
   .catch((err) => {
     console.error("Failed to initialize showcase:", err);
+    // Show visible error state instead of a silent blank page (H3)
+    const initErrorEl = document.getElementById("init-error");
+    if (initErrorEl) initErrorEl.classList.remove("hidden");
+    const btnInitRetry = document.getElementById("btn-init-retry");
+    if (btnInitRetry) btnInitRetry.addEventListener("click", () => window.location.reload());
   });
