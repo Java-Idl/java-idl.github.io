@@ -25,6 +25,25 @@
 
   /* Background grid pattern */
   --grid-color: oklch(78% 0.15 76 / 0.055);
+
+  /* Easing & timing */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 0.15s;
+  --duration-base: 0.18s;
+  --duration-slow: 0.22s;
+
+  /* Font stacks */
+  --font-display: "Audiowide", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+
+  /* Accent glow shadows (alpha ramps) */
+  --accent-glow-sm: 0 0  8px oklch(78% 0.15 76 / 0.20); /* search focus shadow   */
+  --accent-glow-md: 0 0 10px oklch(78% 0.15 76 / 0.18); /* list-item hover        */
+  --accent-glow-lg: 0 0 10px oklch(78% 0.15 76 / 0.20); /* chip / bar hover       */
+  --accent-glow-xl: 0 0 10px oklch(78% 0.15 76 / 0.25); /* node-link active       */
+
+  /* Accent alpha ramps */
+  --accent-focus: oklch(78% 0.15 76 / 0.40); /* focus-visible outline colour */
 }
 
 /* ====== Base Resets ====== */
@@ -43,7 +62,7 @@ body {
   margin: 0;
   background-color: var(--background);
   color: var(--foreground);
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
   background-image:
     linear-gradient(var(--grid-color) 1px, transparent 1px),
@@ -56,7 +75,7 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: "Audiowide", system-ui, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: 0.06em;
   margin: 0;
 }
@@ -82,7 +101,7 @@ h4 {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  transition: grid-template-columns 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: grid-template-columns 0.35s var(--ease-spring);
 }
 
 .shell--panel-open.shell--preview-open {
@@ -109,7 +128,7 @@ h4 {
   gap: 16px;
   padding: 14px 20px;
   border-bottom: 1px solid var(--border);
-  background: oklch(6% 0.008 76); /* solid fallback for unsupported browsers */
+  background: var(--background); /* solid fallback for unsupported browsers */
 }
 
 @supports (backdrop-filter: blur(0)) {
@@ -154,9 +173,9 @@ h4 {
 .chip {
   appearance: none;
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   color: var(--foreground);
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   padding: 10px 18px;
@@ -164,14 +183,16 @@ h4 {
   cursor: pointer;
   text-transform: uppercase;
   transition:
-    background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-    color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 0.18s var(--ease-spring),
+    color 0.18s var(--ease-spring),
+    border-color 0.18s var(--ease-spring),
+    box-shadow 0.18s var(--ease-spring);
 }
 
 .chip:hover {
-  border-color: var(--accent);
+  border-color: var(--foreground);
   color: var(--accent);
+  box-shadow: var(--accent-glow-lg);
 }
 
 .chip[aria-pressed="true"] {
@@ -211,17 +232,12 @@ h4 {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  transition: opacity 0.22s var(--ease-spring);
 }
 
 .shell--list-open .scene-host {
   pointer-events: none;
-  /* Dim the sphere when the list panel is open to visually separate them */
-  opacity: 0.35;
-  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.scene-host {
-  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.25;
 }
 
 .scene-container {
@@ -251,29 +267,30 @@ h4 {
   padding: 14px 10px;
   will-change: transform, opacity;
   background-color: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   color: var(--foreground);
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
   white-space: nowrap;
   text-decoration: none;
   transition:
-    background-color 0.12s ease,
-    border-color 0.12s ease,
-    color 0.12s ease;
+    background-color 0.15s var(--ease-spring),
+    border-color 0.15s var(--ease-spring),
+    color 0.15s var(--ease-spring),
+    box-shadow 0.15s var(--ease-spring);
 }
 
-/* Subtle Highlight swap */
+/* Hover: white border + gold text + whisper glow */
 .node-link:hover,
 .node-link:focus-visible,
 .node-link.is-active {
   background-color: var(--input-bg);
-  border-color: var(--accent);
+  border-color: var(--foreground);
   color: var(--accent);
-  z-index: 9999 !important; /* bring active node to front */
+  box-shadow: var(--accent-glow-xl);
+  z-index: 9999 !important;
   outline: none;
 }
 
@@ -307,7 +324,7 @@ h4 {
   flex-direction: column;
   min-width: 0;
   height: 100vh;
-  animation: panel-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: panel-in 0.32s var(--ease-spring) both;
 }
 
 @keyframes panel-in {
@@ -327,9 +344,9 @@ h4 {
   justify-content: space-between;
   gap: 10px;
   padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  background: var(--accent);
-  color: var(--accent-foreground);
+  border-bottom: 1px solid var(--accent);
+  background: var(--background);
+  color: var(--foreground);
   flex-wrap: wrap;
 }
 
@@ -342,6 +359,7 @@ h4 {
   white-space: nowrap;
   min-width: 0;
   max-width: 32ch;
+  color: var(--accent);
 }
 
 .panel-controls {
@@ -353,10 +371,10 @@ h4 {
 
 .panel-btn {
   appearance: none;
-  border: 1px solid var(--accent-foreground);
-  color: var(--accent-foreground);
+  border: 1px solid var(--accent);
+  color: var(--muted);
   background: transparent;
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   padding: 10px 16px;
@@ -368,12 +386,14 @@ h4 {
   align-items: center;
   justify-content: center;
   transition:
-    background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-    color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color 0.18s var(--ease-spring),
+    color 0.18s var(--ease-spring),
+    border-color 0.18s var(--ease-spring);
 }
 
 .panel-btn:hover:not(:disabled):not(.is-disabled) {
-  background: var(--accent-foreground);
+  background: var(--accent-subtle);
+  border-color: var(--foreground);
   color: var(--accent);
 }
 
@@ -427,7 +447,7 @@ h4 {
   justify-content: center;
   gap: 14px;
   color: var(--accent);
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.8rem;
   letter-spacing: 0.18em;
   text-align: center;
@@ -481,7 +501,7 @@ h4 {
 .about-markdown {
   padding: 28px 28px 56px;
   color: var(--foreground);
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.8;
   max-width: min(720px, 60ch);
@@ -553,7 +573,7 @@ h4 {
 
 .about-markdown li strong {
   color: var(--accent);
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.9rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -606,37 +626,32 @@ h4 {
   border: 1px solid var(--accent);
   /* Subtle shadow to lift the panel off the sphere visually */
   box-shadow: 0 -4px 32px oklch(0% 0 0 / 0.55), 0 0 0 1px var(--accent);
-  z-index: 20;
-  animation: panel-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  z-index: 1000;
+  animation: panel-in 0.22s var(--ease-spring) both;
 }
 
-.list-sheet .panel-header {
-  background: var(--background);
-  color: var(--foreground);
-  border-bottom: 1px solid var(--accent);
-}
-
-.list-sheet .panel-title {
-  color: var(--accent);
-}
+/* .list-sheet .panel-header — inherits base dark background + gold accent border */
 
 .list-search {
   appearance: none;
   background: var(--input-bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   color: var(--accent);
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   padding: 6px 10px;
-  flex: 1; /* grow to fill available space */
-  min-width: 0; /* allow shrinking below content-size to prevent overflow (L1) */
+  flex: 1;
+  min-width: 0;
+  transition: border-color 0.18s var(--ease-spring),
+              box-shadow 0.18s var(--ease-spring);
 }
 
 .list-search:focus-visible {
-  border-color: var(--accent);
-  outline: 2px solid var(--accent);
+  border-color: var(--foreground);
+  outline: 2px solid var(--accent-focus);
   outline-offset: -1px;
+  box-shadow: var(--accent-glow-sm);
 }
 
 .list-sheet .panel-btn--close {
@@ -659,7 +674,7 @@ h4 {
   width: 100%;
   appearance: none;
   background: var(--panel-bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--accent);
   color: var(--foreground);
   padding: 14px 16px;
   display: flex;
@@ -667,19 +682,22 @@ h4 {
   justify-content: space-between;
   gap: 12px;
   cursor: pointer;
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: var(--font-body);
   text-align: left;
   transition:
-    border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-    color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    border-color 0.18s var(--ease-spring),
+    background-color 0.18s var(--ease-spring),
+    color 0.18s var(--ease-spring),
+    box-shadow 0.18s var(--ease-spring);
 }
 
+/* Hover: white border + gold text + whisper glow — matches node-link hover */
 .list-item:hover,
 .list-item.is-active {
-  border-color: var(--accent);
+  border-color: var(--foreground);
   background: var(--input-bg);
   color: var(--accent);
+  box-shadow: var(--accent-glow-md);
 }
 
 .list-item-text {
@@ -691,7 +709,7 @@ h4 {
 }
 
 .list-item-arrow {
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   color: var(--accent);
@@ -702,7 +720,7 @@ h4 {
   text-align: center;
   padding: 40px;
   color: var(--muted);
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   letter-spacing: 0.18em;
   font-size: 0.85rem;
 }
@@ -723,7 +741,7 @@ h4 {
     height: 100vh;
     z-index: 100;
     border: none;
-    animation: panel-in-mobile 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: panel-in-mobile 0.3s var(--ease-spring) both;
   }
 
   @keyframes panel-in-mobile {
@@ -836,7 +854,7 @@ h4 {
   z-index: 15;
   pointer-events: all;
   max-width: calc(100vw - 32px);
-  animation: hint-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+  animation: hint-in 0.45s var(--ease-spring) 0.8s both;
 }
 
 .onboard-hint--hiding {
@@ -854,7 +872,7 @@ h4 {
 }
 
 .onboard-hint__tips li {
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.75rem;
   letter-spacing: 0.14em;
   color: var(--muted);
@@ -877,7 +895,7 @@ h4 {
   background: var(--accent);
   color: var(--accent-foreground);
   border: none;
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   padding: 10px 18px;
@@ -957,7 +975,7 @@ h4 {
 }
 
 .init-error__msg {
-  font-family: "Audiowide", sans-serif;
+  font-family: var(--font-display);
   font-size: 0.9rem;
   letter-spacing: 0.16em;
   color: var(--danger);
@@ -966,7 +984,7 @@ h4 {
 }
 
 .init-error__sub {
-  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.85rem;
   color: var(--muted);
   margin: 0;

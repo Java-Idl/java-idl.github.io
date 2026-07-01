@@ -1,6 +1,3 @@
-// Ported from the original vanilla script.js and TypeScript class.
-// Encapsulated as an ES6 class.
-
 export function normalizeSafeUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== "string") return null;
   try {
@@ -310,10 +307,10 @@ export class SphereEngine {
     const dpr = window.devicePixelRatio || 1;
     const width = Math.max(1, Math.floor(rect.width));
     const height = Math.max(1, Math.floor(rect.height));
-    
+
     this.canvas.width = width * dpr;
     this.canvas.height = height * dpr;
-    
+
     this.state.width = width;
     this.state.height = height;
     this.state.cx = width / 2;
@@ -321,10 +318,10 @@ export class SphereEngine {
     const minDim = Math.min(width, height);
     const isMobile = width < 600;
     this.config.sphereRadius = isMobile ? minDim * 0.25 : minDim * 0.36;
-    
+
     this.ctx.resetTransform();
     this.ctx.scale(dpr, dpr);
-    
+
     this.state.needsRender = true;
   }
 
