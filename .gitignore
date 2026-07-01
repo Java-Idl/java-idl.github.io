@@ -4,6 +4,7 @@ sync-and-push.bat
 task.md
 purge-lovable.ps1
 push-to-pages.ps1
+purge-and-subtree.ps1
 .agent/
 .agent
 out.txt
