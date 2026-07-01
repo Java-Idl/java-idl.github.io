@@ -5,6 +5,8 @@ task.md
 purge-lovable.ps1
 push-to-pages.ps1
 purge-and-subtree.ps1
+check-authors.ps1
+log.txt
 .agent/
 .agent
 out.txt
