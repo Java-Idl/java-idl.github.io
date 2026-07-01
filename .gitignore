@@ -1,0 +1,11 @@
+# Antigravity/Agent working files
+sync-and-push.ps1
+sync-and-push.bat
+task.md
+.agent/
+.agent
+
+# Operating system files
+Thumbs.db
+Desktop.ini
+.DS_Store

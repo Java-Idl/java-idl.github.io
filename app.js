@@ -503,8 +503,8 @@ window.addEventListener("keydown", (e) => {
 
 // Init execution - fetch assets dynamically
 Promise.all([
-  fetch("projects.json").then((res) => res.json()),
-  fetch("about.md").then((res) => res.text()),
+  fetch("pub/projects.json").then((res) => res.json()),
+  fetch("pub/about.md").then((res) => res.text()),
 ])
   .then(([projectsData, aboutMd]) => {
     // Map JSON projects to full objects with safe URLs
