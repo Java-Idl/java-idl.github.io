@@ -204,11 +204,6 @@ export class SphereEngine {
     p.element.style.transform = `translate3d(${p.screenX}px, ${p.screenY}px, 0) scale(${scale}) translate(-50%, -50%)`;
     p.element.style.opacity = String(p.alpha);
     p.element.style.zIndex = String(Math.floor(p.z + this.config.sphereRadius) + 100);
-
-    // Focus-safe depth blur
-    const isFocusedOrActive = p.element === document.activeElement || p.element.classList.contains("is-active");
-    const blur = (!isFocusedOrActive && p.z < 0) ? Math.min(2, (p.z * -1) / (this.config.sphereRadius * 0.5)) : 0;
-    p.element.style.filter = blur > 0.1 ? `blur(${blur.toFixed(1)}px)` : "none";
   }
 
   drawConnections() {
