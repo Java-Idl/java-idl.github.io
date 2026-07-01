@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Javagar Prasath B</title>
+  <meta name="description" content="Security tools, encryption utilities, and browser experiments by Javagar.">
+  <meta name="author" content="Javagar">
+  <meta property="og:title" content="Javagar Prasath B">
+  <meta property="og:description" content="Security tools, encryption utilities, and browser experiments by Javagar.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" type="image/png" href="pub\favicon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="app" class="shell">
+    <div class="shell__main">
+      <header class="shell__bar" aria-label="Controls">
+        <div class="shell__brand">
+          <img src="pub\favicon.png" alt="" class="brand-logo" />
+          <h1 class="brand-name">Javagar Prasath B</h1>
+        </div>
+        <nav class="shell__chips" aria-label="Primary">
+          <button type="button" id="btn-list-toggle" class="chip" aria-pressed="false">
+            LIST
+          </button>
+          <button type="button" id="btn-about-toggle" class="chip chip--accent" aria-pressed="false">
+            ABOUT ME
+          </button>
+        </nav>
+      </header>
+
+      <section class="shell__stage" aria-label="Interactive project sphere">
+        <!-- Canvas Host -->
+        <div class="scene-host">
+          <div id="scene-container" class="scene-container"></div>
+          <canvas id="scene-canvas" class="scene-canvas" role="img"
+            aria-label="Interactive 3D network of project links."></canvas>
+        </div>
+
+        <!-- Onboarding Hint Overlay -->
+        <div id="onboard-hint" class="onboard-hint hidden" role="status" aria-label="Onboarding tips">
+          <ul class="onboard-hint__tips">
+            <li>Click a node to open project</li>
+            <li>Drag to rotate sphere</li>
+            <li>Use LIST for keyboard access</li>
+          </ul>
+          <button type="button" id="btn-onboard-dismiss" class="onboard-hint__btn" aria-label="Dismiss onboarding tips">
+            Got it
+          </button>
+        </div>
+      </section>
+
+      <!-- Project List Sheet -->
+      <section id="list-sheet" class="list-sheet hidden" aria-label="Project list">
+        <header class="panel-header">
+          <h2 class="panel-title" id="list-title">PROJECTS / 0</h2>
+          <div class="panel-controls">
+            <input type="text" id="list-search" class="list-search" placeholder="> FILTER..."
+              aria-label="Filter projects by name" />
+            <button type="button" id="btn-list-close" class="panel-btn panel-btn--close"
+              aria-label="Close project list">✕</button>
+          </div>
+        </header>
+        <!-- Live region announces filter results to screen readers -->
+        <p id="sr-announcer" class="sr-only" aria-live="polite" aria-atomic="true">
+          0 projects
+        </p>
+        <ul id="list-grid" class="list-grid" role="list">
+          <!-- Populated by app.js -->
+        </ul>
+      </section>
+    </div>
+
+    <!-- Project Preview Panel -->
+    <aside id="preview-panel" class="side-panel preview-panel hidden" aria-label="Project preview">
+      <header class="panel-header">
+        <h2 class="panel-title" id="preview-title" title="">
+          Project Preview
+        </h2>
+        <div class="panel-controls">
+          <button type="button" id="btn-preview-retry" class="panel-btn" aria-label="Reload the preview">
+            RETRY
+          </button>
+          <button type="button" id="btn-preview-fullscreen" class="panel-btn" aria-pressed="false">
+            FULLSCREEN
+          </button>
+          <a id="btn-preview-open-full" class="panel-btn" target="_blank" rel="noopener noreferrer"
+            aria-label="Open in new tab">
+            OPEN FULL
+          </a>
+          <button type="button" id="btn-preview-close" class="panel-btn panel-btn--close"
+            aria-label="Close preview">✕</button>
+        </div>
+      </header>
+      <div id="preview-content-wrapper" class="panel-content state-loading">
+        <iframe id="preview-frame" class="panel-frame" title="Project Preview Frame"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        <div id="preview-status" class="frame-status" role="status">
+          <div id="preview-status-bar" class="status-bar loading" />
+          <span id="preview-status-text">ESTABLISHING LINK...</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- About Panel -->
+    <aside id="about-panel" class="side-panel about-panel hidden" aria-label="About me">
+      <header class="panel-header">
+        <h2 class="panel-title">ABOUT</h2>
+        <div class="panel-controls">
+          <button type="button" id="btn-about-close" class="panel-btn panel-btn--close"
+            aria-label="Close about panel">✕</button>
+        </div>
+      </header>
+      <div class="panel-content state-loaded">
+        <article class="about-markdown">
+          <!-- Populated dynamically by app.js -->
+        </article>
+      </div>
+    </aside>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+
+</html>
