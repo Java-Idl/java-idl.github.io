@@ -53,5 +53,10 @@
     "text": "Attendance",
     "url": "https://java-idl.github.io/recoverySim/",
     "importance": "small"
+  },
+  {
+    "text": "WebHID Scanner",
+    "url": "https://java-idl.github.io/web_hid_usb_scanner/",
+    "importance": "medium"
   }
 ]
